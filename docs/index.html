@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Northstar Research | HTF Trend Pullback Trail</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">NORTHSTAR RESEARCH / PHASE 01</p>
+        <h1>HTF Trend Pullback Trail</h1>
+        <p class="subtitle">A transparent price-action workspace for daily bias and H1 execution.</p>
+      </div>
+      <div class="lab-status"><span class="pulse"></span> RESEARCH MODE <span class="slash">/</span> NO LIVE ORDERS</div>
+    </header>
+
+    <section class="toolbar" aria-label="Chart controls">
+      <label for="pair">Market</label>
+      <select id="pair">
+        <option value="EURUSD">EURUSD</option>
+        <option value="GBPUSD">GBPUSD</option>
+        <option value="USDJPY">USDJPY</option>
+        <option value="BTCUSDT">BTCUSDT</option>
+      </select>
+      <span class="timeframe">H1</span>
+      <span class="toolbar-note">Daily bias &middot; EMA50 &middot; sample data</span>
+    </section>
+
+    <section class="workspace">
+      <div class="chart-panel panel">
+        <div class="panel-head">
+          <div><span class="panel-kicker">PRICE ACTION</span><strong id="chart-title">EURUSD / H1</strong></div>
+          <div class="legend"><span><i class="candle-key"></i> OHLC</span><span><i class="ema-key"></i> EMA50</span><span><i class="bias-key"></i> DAILY BIAS</span></div>
+        </div>
+        <div class="chart-wrap"><canvas id="chart" aria-label="EURUSD candlestick chart"></canvas><div class="chart-empty" id="chart-empty">Loading sample bars...</div></div>
+        <div class="chart-footer"><span id="range-label">Sample range</span><span>UTC &middot; illustrative data</span></div>
+      </div>
+
+      <aside class="status-panel panel">
+        <div class="panel-head"><div><span class="panel-kicker">SIGNAL MONITOR</span><strong>Current state</strong></div><span id="status-badge" class="badge wait">WAIT</span></div>
+        <table class="status-table">
+          <tbody>
+            <tr><th>PAIR</th><td id="status-pair">EURUSD</td></tr>
+            <tr><th>PRICE</th><td id="status-price">--</td></tr>
+            <tr><th>H1</th><td>EMA50 <span id="status-h1">--</span></td></tr>
+            <tr><th>DAILY</th><td id="status-daily">NO ALIGN</td></tr>
+            <tr><th>FILTER</th><td id="status-filter">ADX &gt; 18 <span class="muted">pending</span></td></tr>
+            <tr><th>LEVEL</th><td id="status-level">--</td></tr>
+            <tr><th>SL</th><td id="status-sl">--</td></tr>
+            <tr><th>TP</th><td id="status-tp">--</td></tr>
+            <tr><th>ADX</th><td id="status-adx">--</td></tr>
+            <tr><th>ATR</th><td id="status-atr">--</td></tr>
+          </tbody>
+        </table>
+        <div class="status-note"><span class="note-dot"></span><span>Signal engine is intentionally inactive in this dashboard phase. No trade recommendation is generated.</span></div>
+      </aside>
+    </section>
+
+    <section class="research-section">
+      <div class="section-title"><span class="panel-kicker">RESEARCH RECORD</span><h2>Backtest summary</h2><span class="verdict failed">NOT RUN</span></div>
+      <div class="summary-grid">
+        <div class="metric"><span>Date range</span><strong>Pending</strong><small>Sample data loaded</small></div>
+        <div class="metric"><span>Trades</span><strong>--</strong><small>Research pipeline deferred</small></div>
+        <div class="metric"><span>Win rate</span><strong>--</strong><small>Not a target</small></div>
+        <div class="metric"><span>Profit factor</span><strong>--</strong><small>Not evaluated</small></div>
+        <div class="metric"><span>Max drawdown</span><strong>--</strong><small>Not evaluated</small></div>
+        <div class="metric"><span>Total return</span><strong>--</strong><small>Not evaluated</small></div>
+      </div>
+      <div class="split-record"><div><span class="split-label">IN-SAMPLE</span><strong>70%</strong><span>Parameter search window</span></div><div><span class="split-label">OUT-OF-SAMPLE</span><strong>30%</strong><span>Untouched validation window</span></div><p>The optimization and OOS gates are not run in this phase. A failed candidate must remain failed; the system will never tune until a target result appears.</p></div>
+    </section>
+
+    <footer><span>Research tooling only. Not financial advice.</span><span>Data is illustrative and will not match TradingView tick-for-tick.</span></footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+"""Northstar trading research package."""
