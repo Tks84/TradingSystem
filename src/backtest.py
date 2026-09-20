@@ -244,9 +244,14 @@ def trades_to_csv(trades, output_path):
 
 def main():
     """Run backtest on EURUSD H1 sample data."""
-    data_path = Path('data/EURUSD_H1.csv')
+    # Try 2024 full year data first, fallback to sample
+    data_path_new = Path('data/EURUSD_H1_2024.csv')
+    data_path_old = Path('data/EURUSD_H1.csv')
+    
+    data_path = data_path_new if data_path_new.exists() else data_path_old
+    
     if not data_path.exists():
-        print(f"Data file not found: {data_path}")
+        print(f"Data file not found")
         return
     
     print(f"Loading {data_path}...")

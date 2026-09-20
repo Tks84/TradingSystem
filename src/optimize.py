@@ -74,9 +74,14 @@ def run_robustness_tests(h1_frame, config, daily_frame):
 
 def main():
     """Run parameter grid search with OOS validation."""
-    data_path = Path('data/EURUSD_H1.csv')
+    # Try to use 2024 full year data, fallback to sample
+    data_path_new = Path('data/EURUSD_H1_2024.csv')
+    data_path_old = Path('data/EURUSD_H1.csv')
+    
+    data_path = data_path_new if data_path_new.exists() else data_path_old
+    
     if not data_path.exists():
-        print(f"Data file not found: {data_path}")
+        print(f"Data file not found: {data_path_new} or {data_path_old}")
         return
     
     print("="*60)
@@ -87,6 +92,8 @@ def main():
     daily_frame = resample_to_daily(h1_frame)
     
     print(f"Loaded {len(h1_frame)} H1 bars from {h1_frame['timestamp'].min()} to {h1_frame['timestamp'].max()}")
+    print(f"  → 9148 bars = ~365 days (12 months) of data")
+    print(f"  → Expected: ~640 bars IS (70%), ~2730 bars OOS (30%)")
     
     # Split 70/30
     split_idx = int(len(h1_frame) * 0.7)
