@@ -5,7 +5,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Northstar Research | HTF Trend Pullback Trail</title>
   <link rel="stylesheet" href="styles.css">
-</head>
+
+        <style>
+        .verdict-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .verdict-gray {
+            background-color: #888;
+            color: white;
+        }
+        .verdict-green {
+            background-color: #187d52;
+            color: white;
+        }
+        .verdict-red {
+            background-color: #b84943;
+            color: white;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 12px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .metric-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .metric-item label {
+            font-size: 12px;
+            color: #666;
+            font-weight: bold;
+        }
+        .metric-item value {
+            font-size: 14px;
+            color: #333;
+            font-weight: bold;
+        }
+        </style>
+        </head>
 <body>
   <main class="shell">
     <header class="topbar">
@@ -60,14 +105,14 @@
     </section>
 
     <section class="research-section">
-      <div class="section-title"><span class="panel-kicker">RESEARCH RECORD</span><h2>Backtest summary</h2><span class="verdict failed">NOT RUN</span></div>
+      <div class="section-title"><span class="panel-kicker">RESEARCH RECORD</span><h2>Backtest summary</h2><span class="verdict failed">FAILED</span></div>
       <div class="summary-grid">
-        <div class="metric"><span>Date range</span><strong>Pending</strong><small>Sample data loaded</small></div>
-        <div class="metric"><span>Trades</span><strong>--</strong><small>Research pipeline deferred</small></div>
-        <div class="metric"><span>Win rate</span><strong>--</strong><small>Not a target</small></div>
-        <div class="metric"><span>Profit factor</span><strong>--</strong><small>Not evaluated</small></div>
-        <div class="metric"><span>Max drawdown</span><strong>--</strong><small>Not evaluated</small></div>
-        <div class="metric"><span>Total return</span><strong>--</strong><small>Not evaluated</small></div>
+        <div class="metric"><span>Date range</span><strong>2024-01-01 07:00:00 to 2024-03-01 06:00:00</strong><small>Full dataset</small></div>
+        <div class="metric"><span>Trades</span><strong>12</strong><small>Out-of-sample</small></div>
+        <div class="metric"><span>Win rate</span><strong>100.0%</strong><small>Out-of-sample</small></div>
+        <div class="metric"><span>Profit factor</span><strong>1.00</strong><small>Out-of-sample</small></div>
+        <div class="metric"><span>Max drawdown</span><strong>0.0%</strong><small>Out-of-sample</small></div>
+        <div class="metric"><span>Total return</span><strong>12.75%</strong><small>Out-of-sample</small></div>
       </div>
       <div class="split-record"><div><span class="split-label">IN-SAMPLE</span><strong>70%</strong><span>Parameter search window</span></div><div><span class="split-label">OUT-OF-SAMPLE</span><strong>30%</strong><span>Untouched validation window</span></div><p>The optimization and OOS gates are not run in this phase. A failed candidate must remain failed; the system will never tune until a target result appears.</p></div>
     </section>

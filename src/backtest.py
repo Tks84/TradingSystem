@@ -165,16 +165,22 @@ def run_backtest(h1_frame, config=None, daily_frame=None):
                 continue
             
             if daily_bias == 1:
-                h1_subset = h1_frame.iloc[max(0, bar_idx - 5):bar_idx + 1]
-                is_entry, pullback_low = check_pullback_entry(h1_subset, 1, config.ema_fast)
+                # Check for LONG pullback entry on lookback window
+                lookback_start = max(0, bar_idx - 5)
+                h1_lookback = h1_frame.iloc[lookback_start:bar_idx + 1].copy()
+                h1_lookback['ema'] = h1_frame['ema_fast'].iloc[lookback_start:bar_idx + 1].values
+                is_entry, pullback_low = check_pullback_entry(h1_lookback, 1, config.ema_fast)
                 if is_entry and pullback_low is not None:
                     stop_loss = pullback_low - config.sl_atr_mult * current_bar['atr']
                     risk_amount = equity * config.risk_pct
                     current_trade = Trade(bar_idx, current_time, current_price + config.slippage_pips / 10000, 1, stop_loss, risk_amount)
             
             elif daily_bias == -1:
-                h1_subset = h1_frame.iloc[max(0, bar_idx - 5):bar_idx + 1]
-                is_entry, pullback_high = check_pullback_entry(h1_subset, -1, config.ema_fast)
+                # Check for SHORT pullback entry on lookback window
+                lookback_start = max(0, bar_idx - 5)
+                h1_lookback = h1_frame.iloc[lookback_start:bar_idx + 1].copy()
+                h1_lookback['ema'] = h1_frame['ema_fast'].iloc[lookback_start:bar_idx + 1].values
+                is_entry, pullback_high = check_pullback_entry(h1_lookback, -1, config.ema_fast)
                 if is_entry and pullback_high is not None:
                     stop_loss = pullback_high + config.sl_atr_mult * current_bar['atr']
                     risk_amount = equity * config.risk_pct

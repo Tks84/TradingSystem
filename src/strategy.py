@@ -28,13 +28,16 @@ def get_daily_bias(daily_frame, ema_period=200):
 def check_pullback_entry(h1_frame, side, ema_period=50, lookback=5):
     """Check if last bar is a pullback entry signal.
     side: 1 for LONG, -1 for SHORT.
+    h1_frame should have pre-computed 'ema' column.
     Returns (is_entry, pullback_extreme) or (False, None).
     """
-    if len(h1_frame) < ema_period:
+    if len(h1_frame) < lookback + 1:
         return False, None
     
-    h1_frame = h1_frame.copy()
-    h1_frame['ema'] = ema(h1_frame['close'], ema_period)
+    # Use pre-computed EMA if available, otherwise compute
+    if 'ema' not in h1_frame.columns:
+        h1_frame = h1_frame.copy()
+        h1_frame['ema'] = ema(h1_frame['close'], ema_period)
     
     # Get last N bars (lookback window)
     last_bars = h1_frame.iloc[-lookback:]

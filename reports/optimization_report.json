@@ -1,0 +1,80 @@
+{
+  "timestamp": "2026-09-20 13:49:02.191633",
+  "strategy": "HTF Trend Pullback Trail",
+  "verdict": "FAILED",
+  "reason": "Failed OOS validation gates",
+  "combo_tested": {
+    "ema_fast": 50,
+    "adx_min": 18,
+    "sl_atr": 1.5,
+    "trail_atr": 3.0,
+    "session_filter": false
+  },
+  "in_sample": {
+    "total_trades": 46,
+    "winning_trades": 46,
+    "losing_trades": 0,
+    "win_rate": 100.0,
+    "profit_factor": 1.0,
+    "total_return": 5424.148215533125,
+    "total_return_pct": 54.241482155331255,
+    "max_drawdown_pct": 0,
+    "avg_trade": 117.91626555506794,
+    "final_equity": 15424.148215533125
+  },
+  "out_of_sample": {
+    "total_trades": 12,
+    "winning_trades": 12,
+    "losing_trades": 0,
+    "win_rate": 100.0,
+    "profit_factor": 1.0,
+    "total_return": 1275.00122394153,
+    "total_return_pct": 12.750012239415302,
+    "max_drawdown_pct": 0,
+    "avg_trade": 106.25010199512751,
+    "final_equity": 11275.00122394153
+  },
+  "gate_checks": {
+    "profit_factor": false,
+    "max_drawdown": true,
+    "trade_count": false,
+    "avg_trade": "True"
+  },
+  "all_results": [
+    {
+      "combo": {
+        "ema_fast": 50,
+        "adx_min": 18,
+        "sl_atr": 1.5,
+        "trail_atr": 3.0,
+        "session_filter": false
+      },
+      "is": {
+        "total_trades": 46,
+        "winning_trades": 46,
+        "losing_trades": 0,
+        "win_rate": 100.0,
+        "profit_factor": 1.0,
+        "total_return": 5424.148215533125,
+        "total_return_pct": 54.241482155331255,
+        "max_drawdown_pct": 0,
+        "avg_trade": 117.91626555506794,
+        "final_equity": 15424.148215533125
+      },
+      "oos": {
+        "total_trades": 12,
+        "winning_trades": 12,
+        "losing_trades": 0,
+        "win_rate": 100.0,
+        "profit_factor": 1.0,
+        "total_return": 1275.00122394153,
+        "total_return_pct": 12.750012239415302,
+        "max_drawdown_pct": 0,
+        "avg_trade": 106.25010199512751,
+        "final_equity": 11275.00122394153
+      },
+      "robustness": null,
+      "verdict": "FAILED"
+    }
+  ]
+}
