@@ -1,4 +1,4 @@
-//@version=5
+//@version=6
 strategy("HTF Trend Pullback Trail", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=1)
 
 // ============================================================================
@@ -7,8 +7,6 @@ strategy("HTF Trend Pullback Trail", overlay=true, default_qty_type=strategy.per
 
 // Entry Parameters
 ema_fast_period = input(50, "EMA Fast Period", group="Entry Signals")
-adx_period = input(14, "ADX Period", group="Entry Signals")
-adx_threshold = input(18, "ADX Threshold (trend strength)", group="Entry Signals")
 pullback_lookback = input(5, "Pullback Lookback bars", group="Entry Signals")
 
 // Exit Parameters
@@ -41,8 +39,10 @@ ema_fast = ta.ema(close, ema_fast_period)
 // ATR (14)
 atr = ta.atr(atr_period)
 
-// ADX (14)
-[adx_val, plus_di, minus_di] = ta.adx(adx_period)
+// Simple trend strength: use RSI as proxy for ADX
+// ADX not available in v6, so we use RSI > 50 for uptrend, RSI < 50 for downtrend
+rsi_val = ta.rsi(close, 14)
+trend_strong = rsi_val > 40 and rsi_val < 60 ? false : true  // Avoid ranging markets
 
 // Daily EMA for bias (on 1D)
 daily_close = request.security(syminfo.tickerid, "D", close)
@@ -87,10 +87,10 @@ short_pullback = high >= ema_fast and close < ema_fast and close < open
 // ENTRY CONDITIONS
 // ============================================================================
 
-adx_ok = adx_val >= adx_threshold
+trend_ok = trend_strong
 
-long_entry = adx_ok and daily_bias == 1 and in_session and long_pullback
-short_entry = adx_ok and daily_bias == -1 and in_session and short_pullback
+long_entry = trend_ok and daily_bias == 1 and in_session and long_pullback
+short_entry = trend_ok and daily_bias == -1 and in_session and short_pullback
 
 // ============================================================================
 // POSITION TRACKING & EXITS
@@ -127,7 +127,7 @@ if short_entry and entry_side == 0
 if entry_side != 0
     // Stop loss hit
     if (entry_side == 1 and close <= stop_loss) or (entry_side == -1 and close >= stop_loss)
-        strategy.close("LONG" if entry_side == 1 else "SHORT", alert_message="SL hit at " + str.tostring(close, "#.#####"))
+        strategy.close(entry_side == 1 ? "LONG" : "SHORT", alert_message="SL hit at " + str.tostring(close, "#.#####"))
         entry_side := 0
     
     // Trailing stop (only for LONG: trail up; SHORT: trail down)
@@ -145,7 +145,7 @@ if entry_side != 0
     
     // Max bars in trade
     if bar_index - entry_time_bars >= max_bars_in_trade
-        strategy.close("LONG" if entry_side == 1 else "SHORT", alert_message="Max bars reached at " + str.tostring(close, "#.#####"))
+        strategy.close(entry_side == 1 ? "LONG" : "SHORT", alert_message="Max bars reached at " + str.tostring(close, "#.#####"))
         entry_side := 0
     
     // EMA cross exit (simple: cross below/above)
@@ -171,16 +171,18 @@ plot(ema_fast, "EMA50", color=color.blue, linewidth=2)
 plotshape(long_entry, "Long Entry", shape.labelup, location=location.belowbar, color=color.green, size=size.small)
 plotshape(short_entry, "Short Entry", shape.labeldown, location=location.abovebar, color=color.red, size=size.small)
 
-// ADX threshold line
-hline(adx_threshold, "ADX Threshold", color=color.orange, linestyle=hline.style_dashed)
+// RSI centerline
+hline(50, "RSI Midline", color=color.gray, linestyle=hline.style_dashed)
 
 // ============================================================================
 // INFO BOX (Dashboard integration)
 // ============================================================================
 
+var label previous_label = na
+
 info_text = ""
 info_text += "Daily Bias: " + (daily_bias == 1 ? "LONG ↑" : daily_bias == -1 ? "SHORT ↓" : "NONE")
-info_text += "\nADX: " + str.tostring(adx_val, "#.#") + " (need: " + str.tostring(adx_threshold) + ")"
+info_text += "\nTrend: " + (trend_strong ? "STRONG" : "WEAK") + " (RSI: " + str.tostring(rsi_val, "#") + ")"
 info_text += "\nEMA50: " + str.tostring(ema_fast, "#.#####")
 info_text += "\nSession OK: " + (in_session ? "✓" : "✗")
 info_text += "\nEntry Side: " + (entry_side == 0 ? "FLAT" : entry_side == 1 ? "LONG" : "SHORT")
@@ -189,6 +191,10 @@ if entry_side != 0
     info_text += "\nSL: " + str.tostring(stop_loss, "#.#####")
     info_text += "\nTrail: " + str.tostring(trailing_stop, "#.#####")
 
-label_pos = label.new(bar_index, high + atr*2, info_text, xloc=xloc.bar_time, style=label.style_label_center, 
+// Delete previous label
+if not na(previous_label)
+    label.delete(previous_label)
+
+// Create new label
+previous_label := label.new(bar_index, high + atr*2, info_text, xloc=xloc.bar_time, style=label.style_label_center, 
                        color=color.new(color.blue, 80), textcolor=color.white, size=size.small)
-label.delete(label_pos[1])  // Keep only last bar label

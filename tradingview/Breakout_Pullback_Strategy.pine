@@ -1,0 +1,172 @@
+//@version=6
+strategy("Breakout Pullback Strategy", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=1)
+
+// ============================================================================
+// STRATEGY: BREAKOUT + PULLBACK (BALANCED)
+// Goal: 55-60% win rate, 1:2 to 1:3 risk/reward
+// Logic: Enter breakout pullbacks with momentum confirmation
+// ============================================================================
+
+// ============================================================================
+// PARAMETERS
+// ============================================================================
+
+// Breakout Detection
+breakout_lookback = input(20, "Breakout Lookback", group="Breakout Detection")
+breakout_minbars = input(5, "Min Bars Since Breakout", group="Breakout Detection")
+
+// Pullback Confirmation
+pullback_lookback = input(10, "Pullback Lookback", group="Pullback Detection")
+rsi_period = input(14, "RSI Period", group="Entry Signals")
+rsi_level = input(50, "RSI Level for Momentum", group="Entry Signals")
+
+// Exit Management
+atr_period = input(14, "ATR Period", group="Exit Management")
+atr_mult_sl = input(1.0, "Stop Loss (ATR multiplier)", group="Exit Management")
+atr_mult_tp = input(3.0, "Take Profit (ATR multiplier)", group="Exit Management")
+max_hold_bars = input(100, "Max Hold Bars", group="Exit Management")
+
+// ============================================================================
+// INDICATORS
+// ============================================================================
+
+atr = ta.atr(atr_period)
+rsi = ta.rsi(close, rsi_period)
+
+// Breakout levels (from last 20 bars)
+breakout_high = ta.highest(high, breakout_lookback)
+breakout_low = ta.lowest(low, breakout_lookback)
+
+// Pullback detection: Price pulled back from breakout
+pullback_high = ta.highest(high, pullback_lookback)
+pullback_low = ta.lowest(low, pullback_lookback)
+
+// Check if we broke out and then pulled back
+bars_since_breakout_high = ta.barssince(high >= breakout_high)
+bars_since_breakout_low = ta.barssince(low <= breakout_low)
+
+breakout_happened_long = not na(bars_since_breakout_high) and bars_since_breakout_high >= breakout_minbars and bars_since_breakout_high <= breakout_lookback
+breakout_happened_short = not na(bars_since_breakout_low) and bars_since_breakout_low >= breakout_minbars and bars_since_breakout_low <= breakout_lookback
+
+// ============================================================================
+// ENTRY LOGIC
+// ============================================================================
+
+// LONG: Price broke above high, pulled back, now bouncing with RSI > 50
+pullback_from_breakout_high = low >= breakout_low and low <= breakout_high and close > open
+momentum_bullish = rsi > rsi_level
+
+long_entry = breakout_happened_long and pullback_from_breakout_high and momentum_bullish
+
+// SHORT: Price broke below low, pulled back, now bouncing down with RSI < 50
+pullback_from_breakout_low = high <= breakout_high and high >= breakout_low and close < open
+momentum_bearish = rsi < (100 - rsi_level)
+
+short_entry = breakout_happened_short and pullback_from_breakout_low and momentum_bearish
+
+// ============================================================================
+// POSITION TRACKING
+// ============================================================================
+
+var float entry_price = na
+var float stop_loss = na
+var float take_profit = na
+var int entry_side = 0  // 1 = LONG, -1 = SHORT
+var int entry_bar = 0
+
+pip_value = 10000
+
+// LONG Entry
+if long_entry and entry_side == 0
+    entry_price := close
+    stop_loss := breakout_low - atr_mult_sl * atr
+    take_profit := close + atr_mult_tp * atr
+    entry_side := 1
+    entry_bar := bar_index
+    strategy.entry("LONG", strategy.long, alert_message="LONG Breakout Pullback at " + str.tostring(close, "#.#####"))
+
+// SHORT Entry
+if short_entry and entry_side == 0
+    entry_price := close
+    stop_loss := breakout_high + atr_mult_sl * atr
+    take_profit := close - atr_mult_tp * atr
+    entry_side := -1
+    entry_bar := bar_index
+    strategy.entry("SHORT", strategy.short, alert_message="SHORT Breakout Pullback at " + str.tostring(close, "#.#####"))
+
+// ============================================================================
+// EXIT LOGIC
+// ============================================================================
+
+if entry_side != 0
+    // Max hold bars
+    if bar_index - entry_bar >= max_hold_bars
+        strategy.close(entry_side == 1 ? "LONG" : "SHORT", alert_message="Max bars reached")
+        entry_side := 0
+    
+    // LONG exits
+    if entry_side == 1
+        // Stop loss
+        if close <= stop_loss
+            strategy.close("LONG", alert_message="SL hit at " + str.tostring(close, "#.#####"))
+            entry_side := 0
+        // Take profit
+        if close >= take_profit
+            strategy.close("LONG", alert_message="TP hit at " + str.tostring(close, "#.#####"))
+            entry_side := 0
+    
+    // SHORT exits
+    if entry_side == -1
+        // Stop loss
+        if close >= stop_loss
+            strategy.close("SHORT", alert_message="SL hit at " + str.tostring(close, "#.#####"))
+            entry_side := 0
+        // Take profit
+        if close <= take_profit
+            strategy.close("SHORT", alert_message="TP hit at " + str.tostring(close, "#.#####"))
+            entry_side := 0
+
+// ============================================================================
+// VISUALIZATION
+// ============================================================================
+
+// Breakout levels
+plot(breakout_high, "Breakout High", color=color.new(color.red, 50), linewidth=2)
+plot(breakout_low, "Breakout Low", color=color.new(color.green, 50), linewidth=2)
+
+// Entry signals
+plotshape(long_entry, "Long Entry", shape.labelup, location=location.belowbar, color=color.green, size=size.small)
+plotshape(short_entry, "Short Entry", shape.labeldown, location=location.abovebar, color=color.red, size=size.small)
+
+// Stop loss and take profit (plot unconditionally, set to na if flat)
+plot_sl = entry_side != 0 ? stop_loss : na
+plot_tp = entry_side != 0 ? take_profit : na
+plot(plot_sl, "SL", color=color.red, linewidth=1, style=plot.style_linebr)
+plot(plot_tp, "TP", color=color.green, linewidth=1, style=plot.style_linebr)
+
+// RSI reference lines
+hline(50, "RSI Mid", color=color.gray, linestyle=hline.style_dashed)
+hline(rsi_level, "RSI Level", color=color.blue, linestyle=hline.style_dashed)
+hline(100 - rsi_level, "RSI Level", color=color.blue, linestyle=hline.style_dashed)
+
+// ============================================================================
+// INFO BOX
+// ============================================================================
+
+var label previous_label = na
+
+info_text = ""
+info_text += "Breakout High: " + str.tostring(breakout_high, "#.#####")
+info_text += "\nBreakout Low: " + str.tostring(breakout_low, "#.#####")
+info_text += "\nRSI: " + str.tostring(rsi, "#.#")
+info_text += "\nEntry Side: " + (entry_side == 0 ? "FLAT" : entry_side == 1 ? "LONG" : "SHORT")
+if entry_side != 0
+    info_text += "\nEntry: " + str.tostring(entry_price, "#.#####")
+    info_text += "\nSL: " + str.tostring(stop_loss, "#.#####")
+    info_text += "\nTP: " + str.tostring(take_profit, "#.#####")
+
+if not na(previous_label)
+    label.delete(previous_label)
+
+previous_label := label.new(bar_index, high + atr, info_text, xloc=xloc.bar_time, style=label.style_label_center, 
+                       color=color.new(color.blue, 80), textcolor=color.white, size=size.small)
