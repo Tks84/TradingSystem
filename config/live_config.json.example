@@ -1,0 +1,26 @@
+{
+  "broker": {
+    "type": "oanda",
+    "account_id": "YOUR_OANDA_ACCOUNT_ID",
+    "api_token": "YOUR_OANDA_API_TOKEN",
+    "environment": "practice"
+  },
+  "notifier": {
+    "type": "telegram",
+    "bot_token": "YOUR_TELEGRAM_BOT_TOKEN",
+    "chat_id": "YOUR_TELEGRAM_CHAT_ID"
+  },
+  "strategy": {
+    "pair": "EUR_USD",
+    "timeframe": "H1",
+    "check_interval_seconds": 300
+  },
+  "parameters": {
+    "ema_period": 50,
+    "adx_period": 14,
+    "adx_threshold": 18,
+    "sl_pips": 1.5,
+    "trailing_atr_mult": 3.0,
+    "max_bars_in_trade": 80
+  }
+}
