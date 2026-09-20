@@ -1,5 +1,28 @@
 {
-  "status": "NOT RUN",
-  "phase": "dashboard scaffold",
-  "message": "Backtest and optimization are intentionally deferred."
+  "strategy": "HTF Trend Pullback Trail",
+  "data_range": "2024-01-08 07:00:00+00:00 to 2024-01-09 23:00:00+00:00",
+  "in_sample": {
+    "total_trades": 0,
+    "winning_trades": 0,
+    "losing_trades": 0,
+    "win_rate": 0,
+    "profit_factor": 0,
+    "total_return": 0,
+    "total_return_pct": 0.0,
+    "max_drawdown_pct": 0,
+    "avg_trade": 0,
+    "final_equity": 10000
+  },
+  "out_of_sample": {
+    "total_trades": 0,
+    "winning_trades": 0,
+    "losing_trades": 0,
+    "win_rate": 0,
+    "profit_factor": 0,
+    "total_return": 0,
+    "total_return_pct": 0.0,
+    "max_drawdown_pct": 0,
+    "avg_trade": 0,
+    "final_equity": 10000
+  }
 }
